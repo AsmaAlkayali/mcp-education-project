@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mcpdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/mcpdb
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ZOTERO_API_KEY: ${ZOTERO_API_KEY}
+      ZOTERO_USER_ID: ${ZOTERO_USER_ID}
+      CROSSREF_MAILTO: ${CROSSREF_MAILTO}
+    ports:
+      - "8000:8000"
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  pgdata:
