@@ -2,7 +2,7 @@ import os
 import requests
 import openai
 
-openai.api_key = os.getenv("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")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # مثال بحث CrossRef
 def crossref_search(query, rows=5):
@@ -24,8 +24,8 @@ def summarize_with_openai(prompt):
     return resp.choices[0].message.content
 
 def import_to_zotero(items):
-    api_key = os.getenv("tmDpOFvZjPTRurr9uizN54EY")
-    user_id = os.getenv("18292855")
+    api_key = os.getenv("ZOTERO_API_KEY")
+    user_id = os.getenv("ZOTERO_USER_ID")
     headers = {"tmDpOFvZjPTRurr9uizN54EY": api_key, "Content-Type": "application/json"}
     url = f"https://api.zotero.org/users/{user_id}/items"
     r = requests.post(url, headers=headers, json=items)
