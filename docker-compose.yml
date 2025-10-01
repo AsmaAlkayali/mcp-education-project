@@ -1,6 +1,5 @@
-
 services:
-  backend:
+  web:
     build: .
     container_name: mcp-backend
     env_file:
@@ -11,37 +10,6 @@ services:
       - db
     volumes:
       - .:/app
-    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
-
-  db:
-    image: postgres:15
-    container_name: mcp-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mcp_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
-version: "3.9"
-
-services:
-  backend:
-    build: .
-    container_name: mcp-backend
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-    volumes:
-      - .:/app
-    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
   db:
     image: postgres:15
