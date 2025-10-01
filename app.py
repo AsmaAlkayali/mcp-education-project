@@ -4,12 +4,10 @@ from fastapi import FastAPI, Depends, HTTPException, Header
 from pydantic import BaseModel
 from typing import List, Optional
 from policy import check_permission, apply_privacy_filter, log_audit, get_audit_log
-from db import init_db
+from db import init_db, SessionLocal, AuditLog
 from connectors import crossref_search, crossref_get, summarize_with_openai, import_to_zotero
 
-# -------------------------
-# Init DB
-# -------------------------
+
 init_db()
 
 # -------------------------
