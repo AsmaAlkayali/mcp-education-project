@@ -1,61 +1,32 @@
-import httpx
 import os
+import requests
+import openai
 
-# -------------------------
-# CrossRef Connector
-# -------------------------
-async def search_crossref(query: str, rows: int = 5):
-    url = "https://api.crossref.org/works"
-    params = {
-        "query": query,
-        "rows": rows,
-        "mailto": os.getenv("CROSSREF_MAILTO", "you@example.com"),
-    }
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(url, params=params)
-        resp.raise_for_status()
-        data = resp.json()
-        return [
-            {
-                "title": item["title"][0] if item.get("title") else "",
-                "doi": item.get("DOI"),
-                "year": item.get("issued", {}).get("date-parts", [[None]])[0][0],
-            }
-            for item in data["message"]["items"]
-        ]
+openai.api_key = os.getenv("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")
 
+# مثال بحث CrossRef
+def crossref_search(query, rows=5):
+    url = f"https://api.crossref.org/works?query={query}&rows={rows}"
+    r = requests.get(url)
+    return r.json()["message"]["items"]
 
-# -------------------------
-# Semantic Scholar Connector
-# -------------------------
-async def search_semantic(query: str, limit: int = 5):
-    url = "https://api.semanticscholar.org/graph/v1/paper/search"
-    params = {"query": query, "limit": limit, "fields": "title,year,authors,url"}
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(url, params=params)
-        resp.raise_for_status()
-        data = resp.json()
-        return [
-            {
-                "title": item.get("title"),
-                "year": item.get("year"),
-                "authors": [a["name"] for a in item.get("authors", [])],
-                "url": item.get("url"),
-            }
-            for item in data.get("data", [])
-        ]
+def crossref_get(doi):
+    url = f"https://api.crossref.org/works/{doi}"
+    r = requests.get(url)
+    return r.json()["message"]
 
+def summarize_with_openai(prompt):
+    resp = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role":"user","content":prompt}],
+        temperature=0.2
+    )
+    return resp.choices[0].message.content
 
-# -------------------------
-# Zotero Connector
-# -------------------------
-async def add_to_zotero(api_key: str, user_id: str, item: dict):
-    """
-    Add a reference to Zotero library
-    """
+def import_to_zotero(items):
+    api_key = os.getenv("tmDpOFvZjPTRurr9uizN54EY")
+    user_id = os.getenv("18292855")
+    headers = {"tmDpOFvZjPTRurr9uizN54EY": api_key, "Content-Type": "application/json"}
     url = f"https://api.zotero.org/users/{user_id}/items"
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(url, headers=headers, json=[item])
-        resp.raise_for_status()
-        return resp.json()
+    r = requests.post(url, headers=headers, json=items)
+    return r.json()
