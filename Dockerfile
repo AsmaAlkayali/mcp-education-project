@@ -1,26 +1,21 @@
 # Use official Python image
 FROM python:3.10-slim
 
-# Set working directory
+# Set workdir
 WORKDIR /app
 
-# Install system dependencies (for psycopg2 and others)
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
- && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements
+# Copy requirements if exists
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
+# Copy all project files
 COPY . .
 
-# Expose FastAPI port
+# Expose port
 EXPOSE 8000
 
-# Run FastAPI with uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Default command
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
