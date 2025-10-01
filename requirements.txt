@@ -1,7 +1,6 @@
-fastapi
-uvicorn[standard]
-httpx
-sqlalchemy
-psycopg2-binary
-python-dotenv
-openai
+fastapi==0.108.0
+uvicorn[standard]==0.23.2
+pydantic==1.10.12
+requests==2.32.0
+python-dotenv==1.0.0
+psycopg2-binary==2.9.7
