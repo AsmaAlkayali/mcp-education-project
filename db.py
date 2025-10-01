@@ -6,7 +6,7 @@ import os, datetime
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@mcp-db:5432/mcp_db")
 
 engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 class AuditLog(Base):
@@ -20,3 +20,4 @@ class AuditLog(Base):
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+
